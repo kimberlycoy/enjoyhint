@@ -255,7 +255,10 @@ var EnjoyHint = function (_options) {
                 skipAll();
                 break
             default:
-                nextStep();
+                var step = data[that.getCurrentStep()]; 
+                if (step && step.event === event_name) {
+                    nextStep();
+                }
                 break
         }
     };
