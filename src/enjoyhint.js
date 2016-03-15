@@ -1,14 +1,15 @@
-var EnjoyHint = function (_options) {
+var EnjoyHint = function(_options) {
+
     var that = this;
     // Some options
     var defaults = {
-        onStart: function () {
+        onStart: function() {
 
         },
-        onEnd: function () {
+        onEnd: function() {
 
         },
-        onSkip: function () {
+        onSkip: function() {
 
         }
     };
@@ -21,17 +22,17 @@ var EnjoyHint = function (_options) {
     $body = $('body');
 
     /********************* PRIVAT METHODS ***************************************/
-    var init = function () {
+    var init = function() {
         if ($('.enjoyhint'))
             $('.enjoyhint').remove();
-        $('body').css({'overflow':'hidden'});
-        $(document).on("touchmove",lockTouch);
+        $('body').css({ 'overflow': 'hidden' });
+        $(document).on("touchmove", lockTouch);
 
         $body.enjoyhint({
-            onNextClick: function () {
+            onNextClick: function() {
                 nextStep();
             },
-            onSkipClick: function () {
+            onSkipClick: function() {
                 skipAll();
             }
         });
@@ -41,15 +42,15 @@ var EnjoyHint = function (_options) {
         e.preventDefault();
     };
 
-    var destroyEnjoy = function () {
+    var destroyEnjoy = function() {
         $body = $('body');
         $('.enjoyhint').remove();
-        $("body").css({'overflow':'auto'});
+        $("body").css({ 'overflow': 'auto' });
         $(document).off("touchmove", lockTouch);
 
     };
 
-    that.clear = function(){
+    that.clear = function() {
         //(Remove userClass and set default text)
         $(".enjoyhint_next_btn").removeClass(that.nextUserClass);
         $(".enjoyhint_next_btn").text("Next");
@@ -59,16 +60,16 @@ var EnjoyHint = function (_options) {
 
     var $body = $('body');
 
-    var stepAction = function () {
+    var stepAction = function() {
         if (data && data[current_step]) {
-            $(".enjoyhint").removeClass("enjoyhint-step-"+current_step);
-            $(".enjoyhint").addClass("enjoyhint-step-"+(current_step+1));
+            $(".enjoyhint").removeClass("enjoyhint-step-" + current_step);
+            $(".enjoyhint").addClass("enjoyhint-step-" + (current_step + 1));
             var step_data = data[current_step];
             if (step_data.onBeforeStart && typeof step_data.onBeforeStart === 'function') {
                 step_data.onBeforeStart();
             }
             var timeout = step_data.timeout || 0;
-            setTimeout(function () {
+            setTimeout(function() {
                 if (!step_data.selector) {
                     for (var prop in step_data) {
                         if (step_data.hasOwnProperty(prop) && prop.split(" ")[1]) {
@@ -82,13 +83,15 @@ var EnjoyHint = function (_options) {
                         }
                     }
                 }
-                setTimeout(function(){
+                setTimeout(function() {
                     that.clear();
                 }, 250);
-                $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
-                setTimeout(function () {
+                $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, { offset: -100 });
+                setTimeout(function() {
                     var $element = $(step_data.selector);
                     var event = makeEventName(step_data.event);
+
+
 
                     $body.enjoyhint('show');
                     $body.enjoyhint('hide_next');
@@ -96,34 +99,31 @@ var EnjoyHint = function (_options) {
                     if (step_data.event_selector) {
                         $event_element = $(step_data.event_selector);
                     }
-                    if (!step_data.event_type && step_data.event == "key"){
-                        $element.keydown(function( event ) {
-                            if ( event.which == step_data.keyCode ) {
+                    if (!step_data.event_type && step_data.event == "key") {
+                        $element.keydown(function(event) {
+                            if (event.which == step_data.keyCode) {
                                 current_step++;
                                 stepAction();
                             }
                         });
                     }
-                    if (step_data.showNext == true){
+                    if (step_data.showNext == true) {
                         $body.enjoyhint('show_next');
                     }
-                    if (step_data.showSkip == false){
+                    if (!step_data.showSkip) {
                         $body.enjoyhint('hide_skip');
-                    }else{
+                    } else {
                         $body.enjoyhint('show_skip');
                     }
-                    if (step_data.showSkip == true){
-
-                    }
 
 
-                    if (step_data.nextButton){
+                    if (step_data.nextButton) {
                         $(".enjoyhint_next_btn").addClass(step_data.nextButton.className || "");
                         $(".enjoyhint_next_btn").text(step_data.nextButton.text || "Next");
                         that.nextUserClass = step_data.nextButton.className
                     }
 
-                    if (step_data.skipButton){
+                    if (step_data.skipButton) {
                         $(".enjoyhint_skip_btn").addClass(step_data.skipButton.className || "");
                         $(".enjoyhint_skip_btn").text(step_data.skipButton.text || "Skip");
                         that.skipUserClass = step_data.skipButton.className
@@ -142,7 +142,7 @@ var EnjoyHint = function (_options) {
                                 return;
                                 break;
                             case 'custom':
-                                on(step_data.event, function () {
+                                on(step_data.event, function() {
                                     current_step++;
                                     off(step_data.event);
                                     stepAction();
@@ -155,7 +155,8 @@ var EnjoyHint = function (_options) {
                         }
 
                     } else {
-                        $body.on(event, step_data.event_selector || step_data.selector, function (e) {
+                        $body.unbind("click");
+                        $body.on(event, step_data.selector, function(e) {
                             if (step_data.keyCode && e.keyCode != step_data.keyCode) {
                                 return;
                             }
@@ -164,17 +165,16 @@ var EnjoyHint = function (_options) {
 
                             stepAction();
                         });
-
                     }
                     var max_habarites = Math.max($element.outerWidth(), $element.outerHeight());
-                    var radius = step_data.radius  || Math.round(max_habarites / 2) + 5;
+                    var radius = step_data.radius || Math.round(max_habarites / 2) + 5;
                     var offset = $element.offset();
                     var w = $element.outerWidth();
                     var h = $element.outerHeight();
                     var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
                     var coords = {
-                        x: offset.left + Math.round(w / 2) ,
-                        y: offset.top + Math.round(h / 2)  - $(document).scrollTop()
+                        x: offset.left + Math.round(w / 2),
+                        y: offset.top + Math.round(h / 2) - $(document).scrollTop()
                     };
                     var shape_data = {
                         center_x: coords.x,
@@ -207,11 +207,11 @@ var EnjoyHint = function (_options) {
 
     };
 
-    var nextStep = function(){
+    var nextStep = function() {
         current_step++;
         stepAction();
     };
-    var skipAll = function(){
+    var skipAll = function() {
         var step_data = data[current_step];
         var $element = $(step_data.selector);
         off(step_data.event);
@@ -220,33 +220,33 @@ var EnjoyHint = function (_options) {
         destroyEnjoy();
     };
 
-    var makeEventName = function (name, is_custom) {
+    var makeEventName = function(name, is_custom) {
         return name + (is_custom ? 'custom' : '') + '.enjoy_hint';
     };
 
-    var on = function (event_name, callback) {
+    var on = function(event_name, callback) {
         $body.on(makeEventName(event_name, true), callback);
     };
-    var off = function (event_name) {
+    var off = function(event_name) {
         $body.off(makeEventName(event_name, true));
     };
 
     /********************* PUBLIC METHODS ***************************************/
-    that.runScript = function () {
+    that.runScript = function() {
         current_step = 0;
         options.onStart();
         stepAction();
     };
 
-    that.resumeScript = function () {
+    that.resumeScript = function() {
         stepAction();
     };
 
-    that.getCurrentStep = function () {
+    that.getCurrentStep = function() {
         return current_step;
     };
 
-    that.trigger = function (event_name) {
+    that.trigger = function(event_name) {
         switch (event_name) {
             case 'next':
                 nextStep();
@@ -255,7 +255,7 @@ var EnjoyHint = function (_options) {
                 skipAll();
                 break
             default:
-                var step = data[that.getCurrentStep()]; 
+                var step = data[that.getCurrentStep()];
                 if (step && step.event === event_name) {
                     nextStep();
                 }
@@ -263,26 +263,26 @@ var EnjoyHint = function (_options) {
         }
     };
 
-    that.setScript = function (_data) {
+    that.setScript = function(_data) {
         if (_data) {
             data = _data;
         }
     };
 
     //support deprecated API methods
-    that.set = function (_data) {
+    that.set = function(_data) {
         that.setScript(_data);
     };
 
-    that.setSteps = function (_data) {
+    that.setSteps = function(_data) {
         that.setScript(_data);
     };
 
-    that.run = function () {
+    that.run = function() {
         that.runScript();
     };
 
-    that.resume = function () {
+    that.resume = function() {
         that.resumeScript();
     };
 
