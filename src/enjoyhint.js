@@ -108,7 +108,7 @@ var EnjoyHint = function (_options) {
                     if (step_data.showNext == true){
                         $body.enjoyhint('show_next');
                     }
-                    if (!step_data.showSkip == false){
+                    if (!step_data.showSkip){
                         $body.enjoyhint('hide_skip');
                     }else{
                         $body.enjoyhint('show_skip');
