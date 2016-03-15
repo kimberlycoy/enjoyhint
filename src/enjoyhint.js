@@ -11,7 +11,8 @@ var EnjoyHint = function(_options) {
         },
         onSkip: function() {
 
-        }
+        },
+        hideClose: false
     };
     var options = $.extend(defaults, _options);
 
@@ -187,6 +188,12 @@ var EnjoyHint = function(_options) {
                         margin: step_data.margin,
                         scroll: step_data.scroll
                     };
+
+                    if(options.hideClose){
+                        shape_data.close_css = {
+                            'display':'none'
+                        };
+                    }
 
                     if (step_data.shape && step_data.shape == 'circle') {
                         shape_data.shape = 'circle';
