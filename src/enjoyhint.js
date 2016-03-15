@@ -1,5 +1,4 @@
 var EnjoyHint = function (_options) {
-
     var that = this;
     // Some options
     var defaults = {
@@ -12,7 +11,7 @@ var EnjoyHint = function (_options) {
         onSkip: function () {
 
         },
-        hideClose: false
+        hideClose : false
     };
     var options = $.extend(defaults, _options);
 
@@ -26,8 +25,8 @@ var EnjoyHint = function (_options) {
     var init = function () {
         if ($('.enjoyhint'))
             $('.enjoyhint').remove();
-        $('body').css({ 'overflow': 'hidden' });
-        $(document).on("touchmove", lockTouch);
+        $('body').css({'overflow':'hidden'});
+        $(document).on("touchmove",lockTouch);
 
         $body.enjoyhint({
             onNextClick: function () {
@@ -39,19 +38,19 @@ var EnjoyHint = function (_options) {
         });
     };
 
-    var lockTouch = function (e) {
+    var lockTouch = function(e) {
         e.preventDefault();
     };
 
     var destroyEnjoy = function () {
         $body = $('body');
         $('.enjoyhint').remove();
-        $("body").css({ 'overflow': 'auto' });
+        $("body").css({'overflow':'auto'});
         $(document).off("touchmove", lockTouch);
 
     };
 
-    that.clear = function () {
+    that.clear = function(){
         //(Remove userClass and set default text)
         $(".enjoyhint_next_btn").removeClass(that.nextUserClass);
         $(".enjoyhint_next_btn").text("Next");
@@ -63,8 +62,8 @@ var EnjoyHint = function (_options) {
 
     var stepAction = function () {
         if (data && data[current_step]) {
-            $(".enjoyhint").removeClass("enjoyhint-step-" + current_step);
-            $(".enjoyhint").addClass("enjoyhint-step-" + (current_step + 1));
+            $(".enjoyhint").removeClass("enjoyhint-step-"+current_step);
+            $(".enjoyhint").addClass("enjoyhint-step-"+(current_step+1));
             var step_data = data[current_step];
             if (step_data.onBeforeStart && typeof step_data.onBeforeStart === 'function') {
                 step_data.onBeforeStart();
@@ -84,15 +83,13 @@ var EnjoyHint = function (_options) {
                         }
                     }
                 }
-                setTimeout(function () {
+                setTimeout(function(){
                     that.clear();
                 }, 250);
-                $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, { offset: -100 });
+                $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
                 setTimeout(function () {
                     var $element = $(step_data.selector);
                     var event = makeEventName(step_data.event);
-
-
 
                     $body.enjoyhint('show');
                     $body.enjoyhint('hide_next');
@@ -100,31 +97,31 @@ var EnjoyHint = function (_options) {
                     if (step_data.event_selector) {
                         $event_element = $(step_data.event_selector);
                     }
-                    if (!step_data.event_type && step_data.event == "key") {
-                        $element.keydown(function (event) {
-                            if (event.which == step_data.keyCode) {
+                    if (!step_data.event_type && step_data.event == "key"){
+                        $element.keydown(function( event ) {
+                            if ( event.which == step_data.keyCode ) {
                                 current_step++;
                                 stepAction();
                             }
                         });
                     }
-                    if (step_data.showNext == true) {
+                    if (step_data.showNext == true){
                         $body.enjoyhint('show_next');
                     }
-                    if (!step_data.showSkip) {
+                    if (!step_data.showSkip == false){
                         $body.enjoyhint('hide_skip');
-                    } else {
+                    }else{
                         $body.enjoyhint('show_skip');
                     }
 
 
-                    if (step_data.nextButton) {
+                    if (step_data.nextButton){
                         $(".enjoyhint_next_btn").addClass(step_data.nextButton.className || "");
                         $(".enjoyhint_next_btn").text(step_data.nextButton.text || "Next");
                         that.nextUserClass = step_data.nextButton.className
                     }
 
-                    if (step_data.skipButton) {
+                    if (step_data.skipButton){
                         $(".enjoyhint_skip_btn").addClass(step_data.skipButton.className || "");
                         $(".enjoyhint_skip_btn").text(step_data.skipButton.text || "Skip");
                         that.skipUserClass = step_data.skipButton.className
@@ -157,7 +154,7 @@ var EnjoyHint = function (_options) {
 
                     } else {
                         $body.unbind("click");
-                        $body.on(event, step_data.selector, function (e) {
+                        $body.on(event, step_data.event_selector || step_data.selector, function (e) {
                             if (step_data.keyCode && e.keyCode != step_data.keyCode) {
                                 return;
                             }
@@ -166,16 +163,17 @@ var EnjoyHint = function (_options) {
 
                             stepAction();
                         });
+
                     }
                     var max_habarites = Math.max($element.outerWidth(), $element.outerHeight());
-                    var radius = step_data.radius || Math.round(max_habarites / 2) + 5;
+                    var radius = step_data.radius  || Math.round(max_habarites / 2) + 5;
                     var offset = $element.offset();
                     var w = $element.outerWidth();
                     var h = $element.outerHeight();
                     var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
                     var coords = {
-                        x: offset.left + Math.round(w / 2),
-                        y: offset.top + Math.round(h / 2) - $(document).scrollTop()
+                        x: offset.left + Math.round(w / 2) ,
+                        y: offset.top + Math.round(h / 2)  - $(document).scrollTop()
                     };
                     var shape_data = {
                         center_x: coords.x,
@@ -214,11 +212,11 @@ var EnjoyHint = function (_options) {
 
     };
 
-    var nextStep = function () {
+    var nextStep = function(){
         current_step++;
         stepAction();
     };
-    var skipAll = function () {
+    var skipAll = function(){
         var step_data = data[current_step];
         var $element = $(step_data.selector);
         off(step_data.event);
@@ -262,7 +260,7 @@ var EnjoyHint = function (_options) {
                 skipAll();
                 break
             default:
-                var step = data[that.getCurrentStep()];
+                var step = data[that.getCurrentStep()]; 
                 if (step && step.event === event_name) {
                     nextStep();
                 }
