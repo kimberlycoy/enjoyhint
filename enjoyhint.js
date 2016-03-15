@@ -10,7 +10,8 @@ var EnjoyHint = function (_options) {
         },
         onSkip: function () {
 
-        }
+        },
+        hideClose : false
     };
     var options = $.extend(defaults, _options);
 
@@ -107,13 +108,10 @@ var EnjoyHint = function (_options) {
                     if (step_data.showNext == true){
                         $body.enjoyhint('show_next');
                     }
-                    if (step_data.showSkip == false){
+                    if (!step_data.showSkip){
                         $body.enjoyhint('hide_skip');
                     }else{
                         $body.enjoyhint('show_skip');
-                    }
-                    if (step_data.showSkip == true){
-
                     }
 
 
@@ -155,6 +153,7 @@ var EnjoyHint = function (_options) {
                         }
 
                     } else {
+                        $body.unbind("click");
                         $body.on(event, step_data.event_selector || step_data.selector, function (e) {
                             if (step_data.keyCode && e.keyCode != step_data.keyCode) {
                                 return;
@@ -187,6 +186,12 @@ var EnjoyHint = function (_options) {
                         margin: step_data.margin,
                         scroll: step_data.scroll
                     };
+
+                    if (options.hideClose) {
+                        shape_data.close_css = {
+                            'display': 'none'
+                        };
+                    }
 
                     if (step_data.shape && step_data.shape == 'circle') {
                         shape_data.shape = 'circle';
@@ -288,8 +293,7 @@ var EnjoyHint = function (_options) {
 
 
     init();
-};
-;CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+};;CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
     if (w < 2 * r) r = w / 2;
     if (h < 2 * r) r = h / 2;
     this.beginPath();
@@ -839,7 +843,7 @@ var EnjoyHint = function (_options) {
                         left: left_skip,
                         top: label_y + label_height + 20
                     });
-                    that.$close_btn.css({
+                    that.$close_btn.css(data.close_css || {
                         right : 10,
                         top: 10
                     });
