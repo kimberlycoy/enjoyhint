@@ -155,7 +155,8 @@ var EnjoyHint = function (_options) {
                     } else {
                         if (step_data.event === "click" || step_data.event === "change") {
                             $event_element.on(event, function (e) {
-                                console.log(event, e);
+                                $event_element.unbind(event);
+                                
                                 if (step_data.keyCode && e.keyCode != step_data.keyCode) {
                                     return;
                                 }
@@ -165,9 +166,9 @@ var EnjoyHint = function (_options) {
                                 stepAction();
                             });
                         } else {
-                            $body.unbind("click");
                             $body.on(event, step_data.event_selector || step_data.selector, function (e) {
-                                console.log(event, e);
+                                $body.unbind(event);
+
                                 if (step_data.keyCode && e.keyCode != step_data.keyCode) {
                                     return;
                                 }
