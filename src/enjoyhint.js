@@ -153,7 +153,7 @@ var EnjoyHint = function (_options) {
                         }
 
                     } else {
-                        if (step_data.event === "click") {
+                        if (step_data.event === "click" || step_data.event === "change") {
                             $event_element.on(event, function (e) {
                                 console.log(event, e);
                                 if (step_data.keyCode && e.keyCode != step_data.keyCode) {
