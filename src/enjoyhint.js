@@ -153,17 +153,30 @@ var EnjoyHint = function (_options) {
                         }
 
                     } else {
-                        $body.unbind("click");
-                        $body.on(event, step_data.event_selector || step_data.selector, function (e) {
-                            if (step_data.keyCode && e.keyCode != step_data.keyCode) {
-                                return;
-                            }
-                            current_step++;
-                            $(this).off(event);
+                        if (step_data.event === "click") {
+                            $event_element.on(event, function (e) {
+                                console.log(event, e);
+                                if (step_data.keyCode && e.keyCode != step_data.keyCode) {
+                                    return;
+                                }
+                                current_step++;
+                                $(this).off(event);
 
-                            stepAction();
-                        });
+                                stepAction();
+                            });
+                        } else {
+                            $body.unbind("click");
+                            $body.on(event, step_data.event_selector || step_data.selector, function (e) {
+                                console.log(event, e);
+                                if (step_data.keyCode && e.keyCode != step_data.keyCode) {
+                                    return;
+                                }
+                                current_step++;
+                                $(this).off(event);
 
+                                stepAction();
+                            });
+                        }
                     }
                     var max_habarites = Math.max($element.outerWidth(), $element.outerHeight());
                     var radius = step_data.radius  || Math.round(max_habarites / 2) + 5;
