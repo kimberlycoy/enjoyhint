@@ -114,7 +114,6 @@ var EnjoyHint = function (_options) {
                         $body.enjoyhint('hide_skip');
                     }
 
-
                     if (step_data.nextButton){
                         $(".enjoyhint_next_btn").addClass(step_data.nextButton.className || "");
                         $(".enjoyhint_next_btn").text(step_data.nextButton.text || "Next");
@@ -125,6 +124,11 @@ var EnjoyHint = function (_options) {
                         $(".enjoyhint_skip_btn").addClass(step_data.skipButton.className || "");
                         $(".enjoyhint_skip_btn").text(step_data.skipButton.text || "Skip");
                         that.skipUserClass = step_data.skipButton.className
+                    }
+
+                    if (step_data.autoFill){
+                        var selector = step_data.autoFill.selector || step_data.selector;
+                        $(selector).val(step_data.autoFill.content);
                     }
 
                     if (step_data.event_type) {
