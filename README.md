@@ -131,13 +131,6 @@ $.get('/load/some_data', function(data){
 * `onStart` - fires on the first step. (@deprecated)
 * `onEnd` - fires after the last step in script. (@deprecated)
 * `onSkip` - fires after user has clicked skip. (@deprecated)
-```javascript
-var enjoyhint_instance = new EnjoyHint({
-  onStart:function(){
-    //do something
-  }
-});
-```
 * `start` - fires on the first step.
 * `end` - fires on the last step in the script.
 * `skip` - fires after user has clicked skip.
