@@ -2,17 +2,28 @@ var EnjoyHint = function (_options) {
     var that = this;
     // Some options
     var defaults = {
-        onStart: function () {
-
-        },
-        onEnd: function () {
-
-        },
-        onSkip: function () {
-
-        }
+        hideClose : false
     };
     var options = $.extend(defaults, _options);
+
+    // subscribe, emit events
+    that.listeners = [];
+    that.on = function (event, listener) {
+        that.listeners.push({
+            event: event,
+            listener: listener
+        });
+    };
+    that.emit = function (event, data) {
+        that.listeners.forEach(function (listener) {
+            if (new RegExp(listener.event).test(event)) {
+                listener.listener(event, that, data);
+            }
+        });
+    }
+    if (options.onStart) that.on('start', options.onStart);
+    if (options.onEnd) that.on('end', options.onEnd);
+    if (options.onSkip) that.on('skip', options.onSkip);
 
 
     var data = [];
@@ -64,6 +75,9 @@ var EnjoyHint = function (_options) {
             $(".enjoyhint").removeClass("enjoyhint-step-"+current_step);
             $(".enjoyhint").addClass("enjoyhint-step-"+(current_step+1));
             var step_data = data[current_step];
+
+            that.emit('step.start', step_data, that);
+
             if (step_data.onBeforeStart && typeof step_data.onBeforeStart === 'function') {
                 step_data.onBeforeStart();
             }
@@ -107,15 +121,11 @@ var EnjoyHint = function (_options) {
                     if (step_data.showNext == true){
                         $body.enjoyhint('show_next');
                     }
-                    if (step_data.showSkip == false){
-                        $body.enjoyhint('hide_skip');
-                    }else{
+                    if (step_data.showSkip){
                         $body.enjoyhint('show_skip');
+                    }else{
+                        $body.enjoyhint('hide_skip');
                     }
-                    if (step_data.showSkip == true){
-
-                    }
-
 
                     if (step_data.nextButton){
                         $(".enjoyhint_next_btn").addClass(step_data.nextButton.className || "");
@@ -127,6 +137,11 @@ var EnjoyHint = function (_options) {
                         $(".enjoyhint_skip_btn").addClass(step_data.skipButton.className || "");
                         $(".enjoyhint_skip_btn").text(step_data.skipButton.text || "Skip");
                         that.skipUserClass = step_data.skipButton.className
+                    }
+
+                    if (step_data.autoFill){
+                        var selector = step_data.autoFill.selector || step_data.selector;
+                        $(selector).val(step_data.autoFill.content);
                     }
 
                     if (step_data.event_type) {
@@ -155,16 +170,33 @@ var EnjoyHint = function (_options) {
                         }
 
                     } else {
-                        $body.on(event, step_data.event_selector || step_data.selector, function (e) {
-                            if (step_data.keyCode && e.keyCode != step_data.keyCode) {
-                                return;
-                            }
-                            current_step++;
-                            $(this).off(event);
+                        if (step_data.event === "click" || step_data.event === "change") {
+                            $event_element.on(event, function (e) {
+                                $event_element.unbind(event);
+                                
+                                if (step_data.keyCode && e.keyCode != step_data.keyCode) {
+                                    return;
+                                }
+                                current_step++;
+                                $(this).off(event);
 
-                            stepAction();
-                        });
+                                that.emit('step.next', step_data);
+                                stepAction();
+                            });
+                        } else {
+                            $body.on(event, step_data.event_selector || step_data.selector, function (e) {
+                                $body.unbind(event);
 
+                                if (step_data.keyCode && e.keyCode != step_data.keyCode) {
+                                    return;
+                                }
+                                current_step++;
+                                $(this).off(event);
+
+                                that.emit('step.next', step_data);
+                                stepAction();
+                            });
+                        }
                     }
                     var max_habarites = Math.max($element.outerWidth(), $element.outerHeight());
                     var radius = step_data.radius  || Math.round(max_habarites / 2) + 5;
@@ -188,6 +220,12 @@ var EnjoyHint = function (_options) {
                         scroll: step_data.scroll
                     };
 
+                    if (options.hideClose) {
+                        shape_data.close_css = {
+                            'display': 'none'
+                        };
+                    }
+
                     if (step_data.shape && step_data.shape == 'circle') {
                         shape_data.shape = 'circle';
                         shape_data.radius = radius;
@@ -201,13 +239,14 @@ var EnjoyHint = function (_options) {
             }, timeout);
         } else {
             $body.enjoyhint('hide');
-            options.onEnd();
+            that.emit('end');
             destroyEnjoy();
         }
 
     };
 
     var nextStep = function(){
+        that.emit('step.next', data[current_step]); 
         current_step++;
         stepAction();
     };
@@ -216,7 +255,7 @@ var EnjoyHint = function (_options) {
         var $element = $(step_data.selector);
         off(step_data.event);
         $element.off(makeEventName(step_data.event));
-        options.onSkip();
+        that.emit('skip');
         destroyEnjoy();
     };
 
@@ -234,7 +273,7 @@ var EnjoyHint = function (_options) {
     /********************* PUBLIC METHODS ***************************************/
     that.runScript = function () {
         current_step = 0;
-        options.onStart();
+        that.emit('start');
         stepAction();
     };
 
@@ -285,7 +324,6 @@ var EnjoyHint = function (_options) {
     that.resume = function () {
         that.resumeScript();
     };
-
 
     init();
 };
