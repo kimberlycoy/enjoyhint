@@ -67,6 +67,9 @@ var enjoyhint_script_steps = [
 ```
 
 #### Properties of the step configuration
+* `"hideClose" : true` - Default: false. Remove's close button from walkthrough. User cannot close the walkthrough and return to site.
+
+#### Properties of the step configuration
 * `"event selector" : "description"` - to describe a step you should set an event type, selecte element and add description for this element (hint)
 * `keyCode` - the code of a button, which triggers the next EnjoyHint step upon a click. Defined by the “key” event. (“key #block” : “hello”).
 * `event_selector` - if you need to attach an event (that was set in "event" property) to other selector, you can use this one  
@@ -91,7 +94,13 @@ var enjoyhint_script_steps = [
   ```
 * `showSkip` - shows or hides the Skip button (true|false)
 * `showNext` - shows or hides the Next button (true|false)
-
+* `autoFill` - allows you to specify content to be autopopulated into a field during the step. For the example :
+```javascript
+  autoFill : {
+                    "selector": '#foo input'
+                    "content": 'This is the autofilled content.'
+                }
+  ```
 
 
 
