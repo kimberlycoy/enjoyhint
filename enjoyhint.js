@@ -10,7 +10,8 @@ var EnjoyHint = function (_options) {
         },
         onSkip: function () {
 
-        }
+        },
+        hideClose : false
     };
     var options = $.extend(defaults, _options);
 
@@ -107,15 +108,11 @@ var EnjoyHint = function (_options) {
                     if (step_data.showNext == true){
                         $body.enjoyhint('show_next');
                     }
-                    if (step_data.showSkip == false){
-                        $body.enjoyhint('hide_skip');
-                    }else{
+                    if (step_data.showSkip){
                         $body.enjoyhint('show_skip');
+                    }else{
+                        $body.enjoyhint('hide_skip');
                     }
-                    if (step_data.showSkip == true){
-
-                    }
-
 
                     if (step_data.nextButton){
                         $(".enjoyhint_next_btn").addClass(step_data.nextButton.className || "");
@@ -127,6 +124,11 @@ var EnjoyHint = function (_options) {
                         $(".enjoyhint_skip_btn").addClass(step_data.skipButton.className || "");
                         $(".enjoyhint_skip_btn").text(step_data.skipButton.text || "Skip");
                         that.skipUserClass = step_data.skipButton.className
+                    }
+
+                    if (step_data.autoFill){
+                        var selector = step_data.autoFill.selector || step_data.selector;
+                        $(selector).val(step_data.autoFill.content);
                     }
 
                     if (step_data.event_type) {
@@ -155,16 +157,31 @@ var EnjoyHint = function (_options) {
                         }
 
                     } else {
-                        $body.on(event, step_data.event_selector || step_data.selector, function (e) {
-                            if (step_data.keyCode && e.keyCode != step_data.keyCode) {
-                                return;
-                            }
-                            current_step++;
-                            $(this).off(event);
+                        if (step_data.event === "click" || step_data.event === "change") {
+                            $event_element.on(event, function (e) {
+                                $event_element.unbind(event);
+                                
+                                if (step_data.keyCode && e.keyCode != step_data.keyCode) {
+                                    return;
+                                }
+                                current_step++;
+                                $(this).off(event);
 
-                            stepAction();
-                        });
+                                stepAction();
+                            });
+                        } else {
+                            $body.on(event, step_data.event_selector || step_data.selector, function (e) {
+                                $body.unbind(event);
 
+                                if (step_data.keyCode && e.keyCode != step_data.keyCode) {
+                                    return;
+                                }
+                                current_step++;
+                                $(this).off(event);
+
+                                stepAction();
+                            });
+                        }
                     }
                     var max_habarites = Math.max($element.outerWidth(), $element.outerHeight());
                     var radius = step_data.radius  || Math.round(max_habarites / 2) + 5;
@@ -187,6 +204,12 @@ var EnjoyHint = function (_options) {
                         margin: step_data.margin,
                         scroll: step_data.scroll
                     };
+
+                    if (options.hideClose) {
+                        shape_data.close_css = {
+                            'display': 'none'
+                        };
+                    }
 
                     if (step_data.shape && step_data.shape == 'circle') {
                         shape_data.shape = 'circle';
@@ -288,8 +311,7 @@ var EnjoyHint = function (_options) {
 
 
     init();
-};
-;CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+};;CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
     if (w < 2 * r) r = w / 2;
     if (h < 2 * r) r = h / 2;
     this.beginPath();
@@ -839,7 +861,7 @@ var EnjoyHint = function (_options) {
                         left: left_skip,
                         top: label_y + label_height + 20
                     });
-                    that.$close_btn.css({
+                    that.$close_btn.css(data.close_css || {
                         right : 10,
                         top: 10
                     });
