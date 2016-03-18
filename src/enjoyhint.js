@@ -2,15 +2,6 @@ var EnjoyHint = function (_options) {
     var that = this;
     // Some options
     var defaults = {
-        onStart: function () {
-
-        },
-        onEnd: function () {
-
-        },
-        onSkip: function () {
-
-        },
         hideClose : false
     };
     var options = $.extend(defaults, _options);
