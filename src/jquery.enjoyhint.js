@@ -144,6 +144,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                         ctx.globalCompositeOperation = def_comp;
                     }
                 });
+
                 that.shape.radius = circle_r;
                 that.layer.add(that.rect);
                 that.layer.add(that.shape);
@@ -359,6 +360,7 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     var by_top_side = data.by_top_side;
                     var control_point_x = 0;
                     var control_point_y = 0;
+                    var hideArrow = data.hideArrow;
                     if (by_top_side) {
                         if (y_from >= y_to) {
                             control_point_y = y_to;
@@ -377,12 +379,13 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                         }
                     }
 
-                    var text = data.text || '';
                     that.enjoyhint.addClass(that.cl.svg_transparent);
                     setTimeout(function () {
                         $('#enjoyhint_arrpw_line').remove();
                         var d = 'M' + x_from + ',' + y_from + ' Q' + control_point_x + ',' + control_point_y + ' ' + x_to + ',' + y_to;
-                        that.$svg.append(makeSVG('path', {style: "fill:none; stroke:rgb(255,255,255); stroke-width:3", 'marker-end': "url(#arrowMarker)", d: d, id: 'enjoyhint_arrpw_line'}));
+                        if(!data.hideArrow){
+                            that.$svg.append(makeSVG('path', {style: "fill:none; stroke:rgb(255,255,255); stroke-width:3", 'marker-end': "url(#arrowMarker)", d: d, id: 'enjoyhint_arrpw_line'}));
+                        }
                         that.enjoyhint.removeClass(that.cl.svg_transparent);
 
                     }, that.options.animation_time / 2);
@@ -638,7 +641,10 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
                     var label_conn_coordinates = label_data.conn[conn_label_side];
                     var circle_conn_coordinates = shape_data.conn[conn_circle_side];
                     var by_top_side = (arrow_side == 'top') ? true : false;
+
+
                     that.renderArrow({
+                        hideArrow: data.hideArrow,
                         x_from: label_conn_coordinates.x,
                         y_from: label_conn_coordinates.y,
                         x_to: circle_conn_coordinates.x,
@@ -752,4 +758,3 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
         return this;
     };
 })(window.jQuery);
-
