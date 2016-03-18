@@ -83,26 +83,14 @@ var EnjoyHint = function (_options) {
             }
             var timeout = step_data.timeout || 0;
             setTimeout(function () {
-                if (!step_data.selector) {
-                    for (var prop in step_data) {
-                        if (step_data.hasOwnProperty(prop) && prop.split(" ")[1]) {
-                            var space_index = prop.indexOf(" ");
-                            step_data.event = prop.slice(0, space_index);
-                            step_data.selector = prop.slice(space_index + 1);
-                            if (step_data.event == 'next' || step_data.event == 'auto' || step_data.event == 'custom') {
-                                step_data.event_type = step_data.event;
-                            }
-                            step_data.description = step_data[prop];
-                        }
-                    }
-                }
                 setTimeout(function(){
                     that.clear();
                 }, 250);
                 $(document.body).scrollTo(step_data.selector, step_data.scrollAnimationSpeed || 250, {offset: -100});
                 setTimeout(function () {
-                    var $element = $(step_data.selector);
+                    var $element = step_data.selector ? $(step_data.selector) : $('body');
                     var event = makeEventName(step_data.event);
+                    var shape_data = {};
 
                     $body.enjoyhint('show');
                     $body.enjoyhint('hide_next');
@@ -126,6 +114,7 @@ var EnjoyHint = function (_options) {
                     }else{
                         $body.enjoyhint('hide_skip');
                     }
+
 
                     if (step_data.nextButton){
                         $(".enjoyhint_next_btn").addClass(step_data.nextButton.className || "");
@@ -198,27 +187,14 @@ var EnjoyHint = function (_options) {
                             });
                         }
                     }
-                    var max_habarites = Math.max($element.outerWidth(), $element.outerHeight());
-                    var radius = step_data.radius  || Math.round(max_habarites / 2) + 5;
-                    var offset = $element.offset();
-                    var w = $element.outerWidth();
-                    var h = $element.outerHeight();
-                    var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
-                    var coords = {
-                        x: offset.left + Math.round(w / 2) ,
-                        y: offset.top + Math.round(h / 2)  - $(document).scrollTop()
-                    };
-                    var shape_data = {
-                        center_x: coords.x,
-                        center_y: coords.y,
-                        text: step_data.description,
-                        top: step_data.top,
-                        bottom: step_data.bottom,
-                        left: step_data.left,
-                        right: step_data.right,
-                        margin: step_data.margin,
-                        scroll: step_data.scroll
-                    };
+
+                    shape_data = {
+                        text : step_data.description,
+                        width:0,
+                        height:0,
+                        center_x:0,
+                        center_y:0
+                    }
 
                     if (options.hideClose) {
                         shape_data.close_css = {
@@ -226,27 +202,57 @@ var EnjoyHint = function (_options) {
                         };
                     }
 
-                    if (step_data.shape && step_data.shape == 'circle') {
-                        shape_data.shape = 'circle';
-                        shape_data.radius = radius;
-                    } else {
-                        shape_data.radius = 0;
-                        shape_data.width = w + shape_margin;
-                        shape_data.height = h + shape_margin;
+                    if(step_data.selector){
+                        var max_habarites = Math.max($element.outerWidth(), $element.outerHeight());
+                        var radius = step_data.radius  || Math.round(max_habarites / 2) + 5;
+                        var offset = $element.offset();
+                        var w = $element.outerWidth();
+                        var h = $element.outerHeight();
+                        var shape_margin = (step_data.margin !== undefined) ? step_data.margin : 10;
+                        var coords = {
+                            x: offset.left + Math.round(w / 2) ,
+                            y: offset.top + Math.round(h / 2)  - $(document).scrollTop()
+                        };
+                        shape_data = {
+                            center_x: coords.x,
+                            center_y: coords.y,
+                            text: step_data.description,
+                            top: step_data.top,
+                            bottom: step_data.bottom,
+                            left: step_data.left,
+                            right: step_data.right,
+                            margin: step_data.margin,
+                            scroll: step_data.scroll,
+                        };
+
+                        console.log(shape_data);
+
+                        if (step_data.shape && step_data.shape == 'circle') {
+                            shape_data.shape = 'circle';
+                            shape_data.radius = radius;
+                        } else {
+                            shape_data.radius = 0;
+                            shape_data.width = w + shape_margin;
+                            shape_data.height = h + shape_margin;
+                        }
+                    }else{
+                        shape_data.hideArrow = true
                     }
+                        
                     $body.enjoyhint('render_label_with_shape', shape_data);
+                    
                 }, step_data.scrollAnimationSpeed + 20 || 270);
             }, timeout);
         } else {
             $body.enjoyhint('hide');
-            that.emit('end');
+            options.onEnd();
+            that.emit('skip');
             destroyEnjoy();
         }
 
     };
 
     var nextStep = function(){
-        that.emit('step.next', data[current_step]); 
         current_step++;
         stepAction();
     };
@@ -255,7 +261,7 @@ var EnjoyHint = function (_options) {
         var $element = $(step_data.selector);
         off(step_data.event);
         $element.off(makeEventName(step_data.event));
-        that.emit('skip');
+        options.onSkip();
         destroyEnjoy();
     };
 
@@ -273,7 +279,7 @@ var EnjoyHint = function (_options) {
     /********************* PUBLIC METHODS ***************************************/
     that.runScript = function () {
         current_step = 0;
-        that.emit('start');
+        that.emit('skip');
         stepAction();
     };
 
@@ -324,6 +330,7 @@ var EnjoyHint = function (_options) {
     that.resume = function () {
         that.resumeScript();
     };
+
 
     init();
 };
