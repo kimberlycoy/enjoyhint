@@ -92,19 +92,6 @@ var EnjoyHint = function (_options) {
             }
             var timeout = step_data.timeout || 0;
             setTimeout(function () {
-                // if (!step_data.selector) {
-                //     for (var prop in step_data) {
-                //         if (step_data.hasOwnProperty(prop) && prop.split(" ")[1]) {
-                //             var space_index = prop.indexOf(" ");
-                //             step_data.event = prop.slice(0, space_index);
-                //             step_data.selector = prop.slice(space_index + 1);
-                //             if (step_data.event == 'next' || step_data.event == 'auto' || step_data.event == 'custom') {
-                //                 step_data.event_type = step_data.event;
-                //             }
-                //             step_data.description = step_data[prop];
-                //         }
-                //     }
-                // }
                 setTimeout(function(){
                     that.clear();
                 }, 250);
