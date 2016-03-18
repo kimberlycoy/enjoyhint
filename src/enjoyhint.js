@@ -15,6 +15,25 @@ var EnjoyHint = function (_options) {
     };
     var options = $.extend(defaults, _options);
 
+    // subscribe, emit events
+    that.listeners = [];
+    that.on = function (event, listener) {
+        that.listeners.push({
+            event: event,
+            listener: listener
+        });
+    };
+    that.emit = function (event, data) {
+        that.listeners.forEach(function (listener) {
+            if (new RegExp(listener.event).test(event)) {
+                listener.listener(event, that, data);
+            }
+        });
+    }
+    if (options.onStart) that.on('start', options.onStart);
+    if (options.onEnd) that.on('end', options.onEnd);
+    if (options.onSkip) that.on('skip', options.onSkip);
+
 
     var data = [];
     var current_step = 0;
@@ -65,6 +84,9 @@ var EnjoyHint = function (_options) {
             $(".enjoyhint").removeClass("enjoyhint-step-"+current_step);
             $(".enjoyhint").addClass("enjoyhint-step-"+(current_step+1));
             var step_data = data[current_step];
+
+            that.emit('step.start', step_data, that);
+
             if (step_data.onBeforeStart && typeof step_data.onBeforeStart === 'function') {
                 step_data.onBeforeStart();
             }
@@ -169,6 +191,7 @@ var EnjoyHint = function (_options) {
                                 current_step++;
                                 $(this).off(event);
 
+                                that.emit('step.next', step_data);
                                 stepAction();
                             });
                         } else {
@@ -181,6 +204,7 @@ var EnjoyHint = function (_options) {
                                 current_step++;
                                 $(this).off(event);
 
+                                that.emit('step.next', step_data);
                                 stepAction();
                             });
                         }
@@ -244,6 +268,7 @@ var EnjoyHint = function (_options) {
         } else {
             $body.enjoyhint('hide');
             options.onEnd();
+            that.emit('skip');
             destroyEnjoy();
         }
 
@@ -276,7 +301,7 @@ var EnjoyHint = function (_options) {
     /********************* PUBLIC METHODS ***************************************/
     that.runScript = function () {
         current_step = 0;
-        options.onStart();
+        that.emit('skip');
         stepAction();
     };
 
