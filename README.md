@@ -66,7 +66,7 @@ var enjoyhint_script_steps = [
 ];
 ```
 
-#### Properties of the step configuration
+#### Properties of the instance configuration
 * `"hideClose" : true` - Default: false. Remove's close button from walkthrough. User cannot close the walkthrough and return to site.
 
 #### Properties of the step configuration
@@ -124,19 +124,30 @@ $.get('/load/some_data', function(data){
 * `resume` - resume the script from the step where it was stopped. Has no arguments  
 * `getCurrentStep` - returns the current step index
 * `trigger` -  After writing this code you can either move to the next step or finish with EnjoyHint (next|skip)
+* `on` - Subscribe to a script event, e.g. start, end, skip, step.*. Arguments: event, function (event, instance, data) 
 
 #### Events
 **Script Events**:
-* `onStart` - fires on the first step.
-* `onEnd` - fires after the last step in script.
-* `onSkip` - fires after user has clicked skip.
+* `onStart` - fires on the first step. (@deprecated)
+* `onEnd` - fires after the last step in script. (@deprecated)
+* `onSkip` - fires after user has clicked skip. (@deprecated)
+* `start` - fires on the first step.
+* `end` - fires on the last step in the script.
+* `skip` - fires after user has clicked skip.
+* `step.start` - fires before the step is started. 
+* `step.next` - fires when the step is completed or 'Next' is clicked.
 ```javascript
-var enjoyhint_instance = new EnjoyHint({
-  onStart:function(){
-    //do something
-  }
+/**
+  @param: {string} event The event name.
+  @param: {EnjoyHint} instance The EnjoyHint instance.
+  @param: {object} data The step data for "step.*" events, otherwise undefined.
+**/ 
+enjoyhint_instance.on('step.start', function (event, instance, data) {
+    // do something
 });
 ```
+
+
 **Step Events**:  
 * `onBeforeStart` - fires before the step is started.
 ```javascript
