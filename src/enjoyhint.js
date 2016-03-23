@@ -245,14 +245,14 @@ var EnjoyHint = function (_options) {
             }, timeout);
         } else {
             $body.enjoyhint('hide');
-            options.onEnd();
-            that.emit('skip');
+            that.emit('end');
             destroyEnjoy();
         }
 
     };
 
     var nextStep = function(){
+        that.emit('step.next', data[current_step]);        
         current_step++;
         stepAction();
     };
@@ -261,7 +261,7 @@ var EnjoyHint = function (_options) {
         var $element = $(step_data.selector);
         off(step_data.event);
         $element.off(makeEventName(step_data.event));
-        options.onSkip();
+        that.emit('skip');
         destroyEnjoy();
     };
 
@@ -279,7 +279,7 @@ var EnjoyHint = function (_options) {
     /********************* PUBLIC METHODS ***************************************/
     that.runScript = function () {
         current_step = 0;
-        that.emit('skip');
+        that.emit('start');
         stepAction();
     };
 
